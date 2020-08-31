@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from 'cookie-parser';
+import jwt from 'express-jwt';
 
 import { LoginParams } from "../types/request";
 import { isAllowedOrigin } from "./utils";
@@ -11,6 +12,11 @@ const PORT = 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser())
+app.use(jwt({
+  secret: 'urnotzane-secret',
+  algorithms: ['HS256'],
+  username: 'urnotzane'
+}));
 
 app.all("*", function(req, res, next) {
   const { origin } = req.headers;

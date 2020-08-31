@@ -32,13 +32,16 @@ JWT是一个开放标准，它定义了一张用于简洁，自包含用于通�
     "exp": 1441594722,         // 令牌过期时间
   }
   ```
+  也可以使用自定义的字段来填充payload，看你心情。
+  
   它会使用 Base64 编码组成 JWT 结构的第二部分。
 
 - Signature签名
+  
   前两部分使用Base64编码的，即前端可以解开知道里面的信息。Signature需要使用编码后的header和payload以及我们提供的一个密钥，然后使用header中指定的算法进行签名。签名的作用是保证JWT没有被篡改过。
 
 这三部分连在一起就是JWT。
 
 ## 使用
 
-Authorization: Bearer <JWT>
+Authorization: Bearer [JWT]
