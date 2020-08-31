@@ -38,3 +38,7 @@ JWT是一个开放标准，它定义了一张用于简洁，自包含用于通�
   前两部分使用Base64编码的，即前端可以解开知道里面的信息。Signature需要使用编码后的header和payload以及我们提供的一个密钥，然后使用header中指定的算法进行签名。签名的作用是保证JWT没有被篡改过。
 
 这三部分连在一起就是JWT。
+
+## 使用
+
+Authorization: Bearer <JWT>

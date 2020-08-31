@@ -6,14 +6,13 @@ import { LoginParams } from "../types/request";
 import { isAllowedOrigin } from "./utils";
 
 const app = express();
-export const router = express.Router();
 const PORT = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser())
 
-router.all("*", function(req, res, next) {
+app.all("*", function(req, res, next) {
   const { origin } = req.headers;
   if (origin) {
     if (isAllowedOrigin(origin)) {
@@ -32,20 +31,23 @@ router.all("*", function(req, res, next) {
   }
   res.end();
 });
-router.get("/token", (req, res) => {
+app.get("/token", (req, res) => {
   res.send({
     data: req.cookies,
   });
 });
-router.post<{}, {}, LoginParams>("/login", (req, res) => {
+app.get("/page-num", (req, res) => {
+  res.send({
+    data: 10,
+  });
+});
+app.post<{}, {}, LoginParams>("/login", (req, res) => {
   res.cookie("jwt-token", "urnotzane", {
     httpOnly: true,
     maxAge: 10000,
   });
   res.sendStatus(204);
 });
-
-app.use('/', router)
 
 app.listen(PORT, () =>
   console.log(`Server listening on http://localhost:${PORT}`)
