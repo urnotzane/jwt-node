@@ -1,0 +1,52 @@
+{
+  "name": "jwt-node",
+  "version": "1.0.0",
+  "description": "JWT认证实践",
+  "main": "server/index.js",
+  "scripts": {
+    "clear": "rm -rf out && rm -rf dist",
+    "test": "npm run test",
+    "compiler": "npm run clear && tsc",
+    "server": "node out/server/index.js",
+    "html": "cp src/index.html dist",
+    "webpack": "webpack --config out/webpack/index.js",
+    "server-start": "npm run clear && npm run compiler && npm run server",
+    "start": "npm run compiler && node out/webpack/dev-server.js"
+  },
+  "keywords": [
+    "JWT",
+    "node",
+    "typescript"
+  ],
+  "author": "urnotzane",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.11.4",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-react": "^7.10.4",
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/express": "^4.17.7",
+    "@types/node": "^14.6.2",
+    "@types/react": "^16.9.48",
+    "@types/react-dom": "^16.9.8",
+    "@types/webpack": "^4.41.21",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-import": "^1.13.0",
+    "css-loader": "^4.2.2",
+    "html-webpack-plugin": "^4.4.1",
+    "sass-loader": "^10.0.1",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^8.0.3",
+    "typescript": "^4.0.2",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "antd": "^4.6.1",
+    "express": "^4.17.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}
