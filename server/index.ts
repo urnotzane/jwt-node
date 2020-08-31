@@ -1,9 +1,52 @@
-import express from 'express';
+import express from "express";
+import bodyParser from "body-parser";
+import cookieParser from 'cookie-parser';
+
+import { LoginParams } from "../types/request";
+import { isAllowedOrigin } from "./utils";
 
 const app = express();
+export const router = express.Router();
 const PORT = 3000;
 
-app.get('/', (req, res) => res.send('Hello world!'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cookieParser())
 
-app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`))
+router.all("*", function(req, res, next) {
+  const { origin } = req.headers;
+  if (origin) {
+    if (isAllowedOrigin(origin)) {
+      res.header("Access-Control-Allow-Origin", origin);
+    }
+  }
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "content-type");
+  res.header("Access-Control-Allow-Methods", "*");
+  res.header("Content-Type", "application/json;charset=utf-8");
 
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+  } else {
+    next()
+  }
+  res.end();
+});
+router.get("/token", (req, res) => {
+  res.send({
+    data: req.cookies,
+  });
+});
+router.post<{}, {}, LoginParams>("/login", (req, res) => {
+  res.cookie("jwt-token", "urnotzane", {
+    httpOnly: true,
+    maxAge: 10000,
+  });
+  res.sendStatus(204);
+});
+
+app.use('/', router)
+
+app.listen(PORT, () =>
+  console.log(`Server listening on http://localhost:${PORT}`)
+);
