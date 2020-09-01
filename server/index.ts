@@ -6,6 +6,7 @@ import ms from 'ms';
 import { LoginParams } from "../types/request";
 import { isAllowedOrigin } from "./utils";
 import { createToken, verifyToken } from "./utils/token";
+import { IResponse } from "../types/server";
 
 const app = express();
 const PORT = 3000;
@@ -14,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser())
 
-app.all("*", function(req, res, next) {
+app.all("/api*", function(req, res, next) {
   const { origin } = req.headers;
   if (origin) {
     if (isAllowedOrigin(origin)) {
@@ -22,7 +23,7 @@ app.all("*", function(req, res, next) {
     }
   }
   res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Headers", "content-type");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.header("Access-Control-Allow-Methods", "*");
   res.header("Content-Type", "application/json;charset=utf-8");
 
@@ -33,38 +34,55 @@ app.all("*", function(req, res, next) {
   }
   res.end();
 });
-app.get("/token", (req, res) => {
-  const { cookies } = req;
+app.get<{}, IResponse<object|undefined>>("/api/token", (req, res) => {
+  const { cookies, headers } = req;
   const { token } = cookies;
-  verifyToken(token, (error, decode) => {
+  verifyToken(headers.authorization || token, (error, decode) => {
     if (error) {
-      res.status(401).send(error);
+      res.status(401).send({
+        data: undefined,
+        success: false,
+        code: 401,
+        message: error.message,
+      });
     } else {
       res.send({
         data: decode,
+        success: true,
+        code: 200,
+        message: '',
       });
     }
   })
 });
-app.get("/page-num", (req, res) => {
+app.get<{}, IResponse<number>>("/api/page-num", (req, res) => {
   res.send({
     data: 10,
+    success: true,
+    code: 200,
+    message: '',
   });
 });
-app.post<{}, {}, LoginParams>("/login", (req, res) => {
+app.post<{}, IResponse<string>, LoginParams>("/api/login", (req, res) => {
   const { body } = req;
-  res.cookie("token", createToken({
+  const token = createToken({
     userId: 110,
     username: body.username,
     isAdmin: true,
-  }), {
+  });
+  res.cookie("token", token, {
     httpOnly: true,
     maxAge: ms('2m'),
     // 解决空格乱码问题
     encode: decodeURIComponent,
     sameSite: true,
   });
-  res.sendStatus(204);
+  res.send({
+    data: token,
+    success: true,
+    code: 200,
+    message: '',
+  });
 });
 
 app.listen(PORT, () =>

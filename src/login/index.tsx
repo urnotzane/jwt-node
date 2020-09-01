@@ -20,7 +20,7 @@ export const Login = () => {
     try {
       if (values) {
         const res = await loginApi(values);
-        if (res.status !== 204) {
+        if (res.status !== 200) {
           throw new Error(res.status.toString());
         } else {
           message.success('登录成功');

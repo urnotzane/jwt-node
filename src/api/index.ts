@@ -46,4 +46,4 @@ Http.setResInterceptor(
   },
 );
 
-export const localApi = new Http(local);
+export const localApi = new Http(`${local}/api`);
