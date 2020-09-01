@@ -1,10 +1,11 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from 'cookie-parser';
-import jwt from 'express-jwt';
+import ms from 'ms';
 
 import { LoginParams } from "../types/request";
 import { isAllowedOrigin } from "./utils";
+import { createToken, verifyToken } from "./utils/token";
 
 const app = express();
 const PORT = 3000;
@@ -12,11 +13,6 @@ const PORT = 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser())
-app.use(jwt({
-  secret: 'urnotzane-secret',
-  algorithms: ['HS256'],
-  username: 'urnotzane'
-}));
 
 app.all("*", function(req, res, next) {
   const { origin } = req.headers;
@@ -38,9 +34,17 @@ app.all("*", function(req, res, next) {
   res.end();
 });
 app.get("/token", (req, res) => {
-  res.send({
-    data: req.cookies,
-  });
+  const { cookies } = req;
+  const { token } = cookies;
+  verifyToken(token, (error, decode) => {
+    if (error) {
+      res.status(401).send(error);
+    } else {
+      res.send({
+        data: decode,
+      });
+    }
+  })
 });
 app.get("/page-num", (req, res) => {
   res.send({
@@ -48,9 +52,17 @@ app.get("/page-num", (req, res) => {
   });
 });
 app.post<{}, {}, LoginParams>("/login", (req, res) => {
-  res.cookie("jwt-token", "urnotzane", {
+  const { body } = req;
+  res.cookie("token", createToken({
+    userId: 110,
+    username: body.username,
+    isAdmin: true,
+  }), {
     httpOnly: true,
-    maxAge: 10000,
+    maxAge: ms('2m'),
+    // 解决空格乱码问题
+    encode: decodeURIComponent,
+    sameSite: true,
   });
   res.sendStatus(204);
 });
