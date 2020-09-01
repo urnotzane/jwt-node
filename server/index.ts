@@ -4,13 +4,14 @@ import cookieParser from "cookie-parser";
 import ms from "ms";
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
-import config from '../webpack/index';
+import md5 from 'blueimp-md5';
 
 import { LoginParams } from "../types/request";
 import { isAllowedOrigin } from "./utils";
 import { createToken, verifyToken } from "./utils/token";
 import { IResponse, TokenPayload } from "../types/server";
 import { verifyTokenMiddleware } from "./middleware/verify-token";
+import config from '../webpack/index';
 
 const app = express();
 const PORT = 3000;
@@ -76,26 +77,37 @@ app.get<{}, IResponse<number>>("/api/page-num", (req, res) => {
     message: "",
   });
 });
-app.post<{}, IResponse<string>, LoginParams>("/api/login", (req, res, next) => {
+app.post<{}, IResponse<string>, LoginParams>("/api/login", (req, res) => {
   const { body } = req;
-  const token = createToken({
-    userId: 110,
-    username: body.username,
-    isAdmin: true,
-  });
-  res.cookie("token", token, {
-    httpOnly: true,
-    maxAge: ms("2m"),
-    // 解决空格乱码问题
-    encode: decodeURIComponent,
-    sameSite: true,
-  });
-  res.send({
-    data: token,
-    success: true,
-    code: 200,
-    message: "",
-  });
+  const pwd = '';
+  if (pwd === md5(body.password)) {
+    const token = createToken({
+      userId: 110,
+      username: body.username,
+      isAdmin: true,
+    });
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: ms("2m"),
+      // 解决空格乱码问题
+      encode: decodeURIComponent,
+      sameSite: true,
+    });
+    res.send({
+      data: token,
+      success: true,
+      code: 200,
+      message: "",
+    });
+  } else {
+    res.status(422);
+    res.send({
+      data: '',
+      success: false,
+      code: 422,
+      message: "Password or username is wrong",
+    })
+  }
 });
 
 app.listen(PORT, () =>
