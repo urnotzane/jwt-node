@@ -2,6 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import ms from "ms";
+import webpack from 'webpack';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import config from '../webpack/index';
 
 import { LoginParams } from "../types/request";
 import { isAllowedOrigin } from "./utils";
@@ -11,6 +14,12 @@ import { verifyTokenMiddleware } from "./middleware/verify-token";
 
 const app = express();
 const PORT = 3000;
+const compiler = webpack(config);
+
+// front server
+app.use(webpackDevMiddleware(compiler as any, {
+  publicPath: (config as any).output.publicPath
+}));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -53,7 +62,7 @@ app.get<{}, IResponse<TokenPayload | undefined>>("/api/token", (req, res) => {
           isAdmin,
         },
         success: true,
-        code: 200,
+        code: 204,
         message: "",
       });
     }

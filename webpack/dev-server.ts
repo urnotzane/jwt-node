@@ -5,7 +5,7 @@ import config from './index';
 
 const compiler = webpack(config);
 const app = express();
-const PORT = 9000;
+const PORT = 4000;
 
 app.use(webpackDevMiddleware(compiler as any, {
   publicPath: (config as any).output.publicPath

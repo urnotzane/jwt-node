@@ -10,8 +10,8 @@
     "server": "node out/server/index.js",
     "html": "cp src/index.html dist",
     "webpack": "webpack --config out/webpack/index.js",
-    "server-start": "npm run clear && npm run compiler && npm run server --watch",
-    "start": "npm run compiler && node out/webpack/dev-server.js"
+    "server-start": "npm run clear && npm run compiler && npm run server",
+    "front-start": "npm run compiler && node out/webpack/dev-server.js"
   },
   "keywords": [
     "JWT",
@@ -50,6 +50,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@types/webpack-dev-middleware": "^3.7.2",
     "antd": "^4.6.1",
     "axios": "^0.20.0",
     "cookie-parser": "^1.4.5",
