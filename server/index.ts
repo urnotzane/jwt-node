@@ -6,7 +6,8 @@ import ms from 'ms';
 import { LoginParams } from "../types/request";
 import { isAllowedOrigin } from "./utils";
 import { createToken, verifyToken } from "./utils/token";
-import { IResponse } from "../types/server";
+import { IResponse, TokenPayload } from "../types/server";
+import { verifyTokenMiddleware } from "./middleware/verify-token";
 
 const app = express();
 const PORT = 3000;
@@ -14,6 +15,7 @@ const PORT = 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser())
+app.use(verifyTokenMiddleware);
 
 app.all("/api*", function(req, res, next) {
   const { origin } = req.headers;
@@ -34,20 +36,18 @@ app.all("/api*", function(req, res, next) {
   }
   res.end();
 });
-app.get<{}, IResponse<object|undefined>>("/api/token", (req, res) => {
+app.get<{}, IResponse<TokenPayload | undefined>>("/api/token", (req, res) => {
   const { cookies, headers } = req;
   const { token } = cookies;
   verifyToken(headers.authorization || token, (error, decode) => {
-    if (error) {
-      res.status(401).send({
-        data: undefined,
-        success: false,
-        code: 401,
-        message: error.message,
-      });
-    } else {
+    if (!error) {
+      const { userId, username, isAdmin} = decode as TokenPayload
       res.send({
-        data: decode,
+        data: {
+          userId,
+          username,
+          isAdmin,
+        },
         success: true,
         code: 200,
         message: '',

@@ -45,3 +45,6 @@ JWT是一个开放标准，它定义了一张用于简洁，自包含用于通�
 ## 使用
 
 Authorization: Bearer [JWT]
+
+## 校验优先级
+如果headers.authorization优先于cookies。

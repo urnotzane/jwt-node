@@ -6,7 +6,7 @@ import { tokenPrefix, issuer } from '../constants';
 export const createToken = (payload:TokenPayload) => {
   const clearToken = jwt.sign({
     ...payload,
-  }, 'urnotzane', {
+  }, issuer, {
     issuer,
     expiresIn: '1m',
   });
